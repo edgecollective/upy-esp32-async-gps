@@ -112,7 +112,7 @@ def push_count():
         #await push_event("%s" % i)
         await push_event(ev_str)
         i += 1
-        #await uasyncio.sleep(1)
+        await uasyncio.sleep(1)
 
 
 #import logging
