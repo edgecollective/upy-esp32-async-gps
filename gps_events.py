@@ -14,17 +14,24 @@ uart=UART(2,baudrate=9600,rx=16,tx=17,timeout=10)
 sreader = uasyncio.StreamReader(uart)  # Create a
 gps = as_GPS.AS_GPS(sreader)  # Instantiate GPS
 
-ssid = "jpl"
-password =  "mars-adventure"
+#ssid = "jpl"
+#password =  "mars-adventure"
  
-station = network.WLAN(network.STA_IF)
-station.active(True)
-station.connect(ssid, password)
+#station = network.WLAN(network.STA_IF)
+#station.active(True)
+#station.connect(ssid, password)
 
-while station.isconnected() == False:
+essid = "bob"
+password = "uncle"
+ap=network.WLAN(network.AP_IF)
+ap.active(True)
+ap.config(essid=essid,password=password)
+
+
+while ap.isconnected() == False:
     pass
 
-ip = station.ifconfig()
+ip = ap.ifconfig()
 
 event_sinks = set()
 
