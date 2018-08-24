@@ -28,8 +28,8 @@ ap.active(True)
 ap.config(essid=essid,password=password)
 
 
-while ap.isconnected() == False:
-    pass
+#while ap.isconnected() == False:
+#    pass
 
 ip = ap.ifconfig()
 
