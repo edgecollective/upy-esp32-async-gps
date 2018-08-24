@@ -167,6 +167,13 @@ def push_count():
         pick=random.randint(0,len(commands)-1)
         cmd=commands[pick]
         await push_event("command %s is: %s" % (i,cmd))
+        await asyncio.sleep(1)
+        res = await master.send_command(cmd)
+        if res:
+            for line in res:
+                rep=str(line.decode('UTF8')).strip()
+                await push_event("response %s is: %s" % (i,rep))
+                await asyncio.sleep(1)
         i += 1
         await asyncio.sleep(1)
 
@@ -176,6 +183,8 @@ def push_count():
 #logging.basicConfig(level=logging.DEBUG)
 
 loop = asyncio.get_event_loop()
+master = MASTER()
+device = DEVICE()
 loop.create_task(push_count())
 
 #app = picoweb.WebApp(__name__, ROUTES)
