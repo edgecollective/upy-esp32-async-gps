@@ -267,8 +267,11 @@ class RFM9x:
     def __init__(self, spi, cs, reset, frequency, *, preamble_length=8,
                  high_power=True, baudrate=5000000):
         self.high_power = high_power
+        self.cs=cs
         
     def _read_into(self, address, buf, length=None):
+        self.cs.value(1) # reset to default
+        self.cs.value(0) # pull low for spi access
         # Read a number of bytes from the specified address into the provided
         # buffer.  If length is not specified (the default) the entire buffer
         # will be filled.
@@ -286,6 +289,7 @@ class RFM9x:
         spi.readinto(newbuf)
         buf[0:len(newbuf)]=newbuf
         print("after:\n",self._BUFFER)
+        self.cs.value(1) # reset to default
 
 from machine import Pin
 from machine import SPI
@@ -297,7 +301,7 @@ miso=Pin(19)
 cs = Pin(12, Pin.OUT)
 reset=Pin(13)
 
-cs.value(1)
+
 
 address=const(0x02) #-- seems constant across widgets
 
@@ -307,9 +311,11 @@ rfm9x = RFM9x(spi, cs, reset, 915.0)
 
 mybuff=bytearray(10)
 
-cs.value(0)
+#cs.value(0)
 rfm9x._read_into(address,mybuff,length=1)
-cs.value(1)
+#cs.value(1)
 
 print(mybuff[0])
+
+spi.deinit()
 
