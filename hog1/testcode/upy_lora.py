@@ -290,6 +290,11 @@ class RFM9x:
         buf[0:len(newbuf)]=newbuf
         print("after:\n",self._BUFFER)
         self.cs.value(1) # reset to default
+        
+    def _read_u8(self, address):
+        # Read a single byte from the provided address and return it.
+        self._read_into(address, self._BUFFER, length=1)
+        return self._BUFFER[0]
 
 from machine import Pin
 from machine import SPI
@@ -312,10 +317,13 @@ rfm9x = RFM9x(spi, cs, reset, 915.0)
 mybuff=bytearray(10)
 
 #cs.value(0)
-rfm9x._read_into(address,mybuff,length=1)
+#rfm9x._read_into(address,mybuff,length=1)
+#print(mybuff[0])
+
+print(rfm9x._read_u8(address))
 #cs.value(1)
 
-print(mybuff[0])
+
 
 spi.deinit()
 
