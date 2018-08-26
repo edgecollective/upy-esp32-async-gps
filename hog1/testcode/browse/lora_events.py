@@ -7,6 +7,7 @@
 import uasyncio
 import picoweb
 import network
+import time
 
 from machine import Pin
 from machine import SPI
@@ -18,10 +19,13 @@ mosi=Pin(18)
 miso=Pin(19)
 cs = Pin(12, Pin.OUT)
 #reset=Pin(13)
+resetNum=15
+
+led = Pin(13,Pin.OUT)
 
 spi=SPI(2,baudrate=5000000,sck=sck,mosi=mosi,miso=miso)
 
-resetNum=13
+
 
 rfm9x = RFM9x(spi, cs, resetNum, 915.0)
 
@@ -42,6 +46,12 @@ event_sinks = set()
 #
 # Webapp part
 #
+
+def blink(duration):
+    led.value(1)
+    time.sleep(duration)
+    led.value(0)
+    time.sleep(duration)
 
 def index(req, resp):
     yield from picoweb.start_response(resp)
@@ -135,5 +145,7 @@ app = picoweb.WebApp(None, ROUTES)
 # 1 (True) debug logging
 # 2 extra debug logging
 print("host:"+ip[0])
+for i in range(3):
+    blink(.2)
 # note: you'll need to visit ipaddress:8081
 app.run(debug=-1,host=ip[0])
