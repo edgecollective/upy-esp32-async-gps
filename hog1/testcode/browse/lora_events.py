@@ -147,5 +147,6 @@ app = picoweb.WebApp(None, ROUTES)
 print("host:"+ip[0])
 for i in range(3):
     blink(.2)
+led.value(1)
 # note: you'll need to visit ipaddress:8081
 app.run(debug=-1,host=ip[0])
