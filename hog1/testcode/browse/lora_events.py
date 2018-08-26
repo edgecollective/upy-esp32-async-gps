@@ -117,6 +117,7 @@ def push_event(ev):
 def push_count():
     i = 0
     while 1:
+        print("listening ...")
         await rfm9x.receive(timeout=5.0)
         if rfm9x.packet is not None:
             packet_text = str(rfm9x.packet, 'ascii')
@@ -125,8 +126,10 @@ def push_count():
             print("RSSI:",rssi)
             await push_event("packet: %s; RSSI: %s" % (packet_text,rssi))
         else:
+            print("got nuthin ...")
             await push_event("%s" % i)
         i += 1
+        print ("sleeping")
         await uasyncio.sleep(1)
 
 

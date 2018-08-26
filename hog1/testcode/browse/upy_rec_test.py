@@ -1,7 +1,7 @@
 from machine import Pin
 from machine import SPI
 
-from upy_rfm9x_1 import RFM9x
+from upy_rfm9x import RFM9x
 
 import time
 
