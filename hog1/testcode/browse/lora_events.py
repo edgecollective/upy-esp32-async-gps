@@ -52,11 +52,11 @@ def index(req, resp):
 <script>
 var source = new EventSource("events");
 source.onmessage = function(event) {
-    document.getElementById("result").innerHTML += event.data + "<br>";
+    document.getElementById("result").innerHTML = event.data + "<br>";
 }
 source.onerror = function(error) {
     console.log(error);
-    document.getElementById("result").innerHTML += "EventSource error:" + error + "<br>";
+    document.getElementById("result").innerHTML = "EventSource error:" + error + "<br>";
 }
 </script>
 </head>
