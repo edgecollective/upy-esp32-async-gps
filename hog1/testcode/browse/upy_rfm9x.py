@@ -274,6 +274,7 @@ class RFM9x:
         #self.reset=reset
         self.reset=Pin(resetNum,Pin.PULL_UP)
         self.reset()
+        self.packet=None
         try:
             # Set sleep mode, wait 10s and confirm in sleep mode (basic device check).
             # Also set long range mode (LoRa mode) as it can only be done in sleep.
@@ -530,23 +531,23 @@ class RFM9x:
                 timed_out = True
                 
         # Payload ready is set, a packet is in the FIFO.
-        packet = None
+        self.packet = None
         if not timed_out:
             # Grab the length of the received packet and check it has at least 5
             # bytes to indicate the 4 byte header and at least 1 byte of user data.
             length = self._read_u8(_RH_RF95_REG_13_RX_NB_BYTES)
             if length < 5:
-                packet = None
+                self.packet = None
             else:
                 # Have a good packet, grab it from the FIFO.
                 # Reset the fifo read ptr to the beginning of the packet.
                 current_addr = self._read_u8(_RH_RF95_REG_10_FIFO_RX_CURRENT_ADDR)
                 self._write_u8(_RH_RF95_REG_0D_FIFO_ADDR_PTR, current_addr)
-                packet = bytearray(length)
+                self.packet = bytearray(length)
                 # Read the packet.
-                self._read_into(_RH_RF95_REG_00_FIFO, packet)
+                self._read_into(_RH_RF95_REG_00_FIFO, self.packet)
                 # strip off the header
-                packet = packet[4:]
+                self.packet = self.packet[4:]
             # Listen again if necessary and return the result packet.
         if keep_listening:
             self.listen()
@@ -555,7 +556,7 @@ class RFM9x:
             self.idle()
         # Clear interrupt.
         self._write_u8(_RH_RF95_REG_12_IRQ_FLAGS, 0xFF)
-        return packet
+        return self.packet
 
 
 
