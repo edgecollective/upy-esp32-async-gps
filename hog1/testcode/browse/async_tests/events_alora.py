@@ -12,9 +12,7 @@ import time
 from machine import Pin
 from machine import SPI
 
-from upy_rfm9x import RFM9x
-
-TIMEOUT = 5
+from upy_arfm9x import RFM9x
 
 sck=Pin(5)
 mosi=Pin(18)
@@ -115,21 +113,42 @@ def push_event(ev):
     for resp in to_del:
         event_sinks.remove(resp)
 
-
-def push_count():
-    i = 0
-    while True:
-        rfm9x.receive(timeout=TIMEOUT)
+async def grab_radio():
+    try:
+        #await rfm9x.receive(timeout=5.0)
+        await rfm9x.receive()
         if rfm9x.packet is not None:
             packet_text = str(rfm9x.packet, 'ascii')
             rssi=str(rfm9x.rssi)
             print('Received: {0}'.format(packet_text))
             print("RSSI:",rssi)
-            await push_event("[%s]: %s </br> RSSI: %s" % (i, packet_text,rssi))
+    except uasyncio.TimeoutError:
+        print('got timeout')
+
+async def foo():
+    while True:
+        await uasyncio.wait_for(grab_radio(),3)
+        await uasyncio.sleep(2)
+    
+
+    
+
+async def push_count():
+    i = 0
+    while 1:
+        print("listening ...")
+        await rfm9x.receive(timeout=5.0)
+        if rfm9x.packet is not None:
+            packet_text = str(rfm9x.packet, 'ascii')
+            rssi=str(rfm9x.rssi)
+            print('Received: {0}'.format(packet_text))
+            print("RSSI:",rssi)
+            await push_event("packet: %s; RSSI: %s" % (packet_text,rssi))
         else:
-            print("No packet ... ")
-            await push_event("[%s]: (timed out)" % i)
+            print("got nuthin ...")
+            await push_event("%s" % i)
         i += 1
+        print ("sleeping")
         await uasyncio.sleep(1)
 
 
@@ -137,8 +156,12 @@ def push_count():
 #logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.DEBUG)
 
+#loop = uasyncio.get_event_loop()
+#loop.create_task(foo())
+
 loop = uasyncio.get_event_loop()
-loop.create_task(push_count())
+loop.create_task(grab_radio())
+loop.run_forever()
 
 #app = picoweb.WebApp(__name__, ROUTES)
 app = picoweb.WebApp(None, ROUTES)

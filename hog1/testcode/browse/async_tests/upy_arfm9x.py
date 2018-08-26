@@ -198,11 +198,11 @@ RX_MODE      = 0b101
 
 class RFM9x:
 
-    def __await__(self):
-        for n in range(5):
-            print('__await__ called')
-            yield from asyncio.sleep(1) # Other coros get scheduled here
-        return 42
+    def __await__(self):  # Typical use, loop until an interface becomes ready.
+        while self.count:
+            print(self.count)
+            yield
+            self.count -= 1
     
     __iter__ = __await__
     
